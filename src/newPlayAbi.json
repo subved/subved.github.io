@@ -27,8 +27,7 @@
       }
     ],
     "name": "AccessAllowed",
-    "type": "event",
-    "signature": "0xdaa6f74aee7ee67b019171c24fdcfc6d981c279df198c623367e87dd8dce375e"
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -59,8 +58,7 @@
       }
     ],
     "name": "CopyPlayer",
-    "type": "event",
-    "signature": "0xe6643109984b4dbf268b0175517cd19bb1f7c17abf9562139298c4628d81b694"
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -85,8 +83,7 @@
       }
     ],
     "name": "FailPlayer",
-    "type": "event",
-    "signature": "0xc5fd1c71a1de33bc0f5cde303aaeeee38926ad24c8fc8ca42788ee3982aca647"
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -111,8 +108,7 @@
       }
     ],
     "name": "KillPlayer",
-    "type": "event",
-    "signature": "0x07fd7187518897cd9aa423812e09790dbe8ae3b179d2d2da00620e138f82c889"
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -155,8 +151,7 @@
       }
     ],
     "name": "LevelUp",
-    "type": "event",
-    "signature": "0x5f763ddaad97ba9bded66a0ecb8fe108e39efa0216502a2794fe7f8fb25ab80f"
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -193,8 +188,50 @@
       }
     ],
     "name": "NewPlayer",
-    "type": "event",
-    "signature": "0x05efffd2fd1286223216a9ccbcbb6d856651316e95fa28cc7ddbedbd9fe75e26"
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "coin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "coinValue",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "bnxAddr",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "payValue",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "request",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewePlayerTrade",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -213,8 +250,7 @@
       }
     ],
     "name": "OwnershipTransferred",
-    "type": "event",
-    "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -227,8 +263,7 @@
       }
     ],
     "name": "Paused",
-    "type": "event",
-    "signature": "0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258"
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -241,8 +276,7 @@
       }
     ],
     "name": "Unpaused",
-    "type": "event",
-    "signature": "0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa"
+    "type": "event"
   },
   {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
@@ -263,18 +297,14 @@
       { "internalType": "uint256", "name": "maxnum", "type": "uint256" }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x6c44d6be"
+    "type": "function"
   },
   {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "CareerNum",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x0297d8f9"
+    "type": "function"
   },
   {
     "inputs": [
@@ -284,9 +314,7 @@
     "name": "accCareer",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x7e735ebf"
+    "type": "function"
   },
   {
     "inputs": [
@@ -296,19 +324,14 @@
     "name": "addCareer",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x7c285c03"
+    "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "value", "type": "uint256" },
-      { "internalType": "uint256", "name": "bnxValue", "type": "uint256" }
-    ],
-    "name": "batchNewPlayer",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xc4b8b45c"
+    "inputs": [],
+    "name": "bnbValue",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -318,17 +341,7 @@
     "name": "changePlayer",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xe0d8eaba"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "copyIds",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xc23d082b"
+    "type": "function"
   },
   {
     "inputs": [
@@ -338,35 +351,21 @@
     "name": "copyPlayer",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xfd593501"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "copyPlayerInfo",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x5989981e"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "defaultCareer",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x50082120"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "gasLimit",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xf68016b7"
+    "type": "function"
   },
   {
     "inputs": [
@@ -377,9 +376,7 @@
       { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xbe40c2b2"
+    "type": "function"
   },
   {
     "inputs": [
@@ -388,38 +385,14 @@
     "name": "getCareerAddrs",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xf3d33aac"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "getCareerAddrsLen",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x3035c5bc"
-  },
-  {
-    "inputs": [],
-    "name": "getCopyIds",
-    "outputs": [
-      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x448374c0"
-  },
-  {
-    "inputs": [],
-    "name": "getCopyIdsLen",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xb689d674"
+    "type": "function"
   },
   {
     "inputs": [
@@ -430,9 +403,14 @@
       { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xc9ec2875"
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNew",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [
@@ -444,9 +422,7 @@
       { "internalType": "address", "name": "", "type": "address" }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x305041d0"
+    "type": "function"
   },
   {
     "inputs": [
@@ -457,9 +433,7 @@
       { "internalType": "uint256[2]", "name": "", "type": "uint256[2]" }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x7b12ad11"
+    "type": "function"
   },
   {
     "inputs": [
@@ -468,8 +442,7 @@
     "name": "grantAccess",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x0ae5e739"
+    "type": "function"
   },
   {
     "inputs": [
@@ -478,18 +451,14 @@
     "name": "hasAccess",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x95a078e8"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "intervalTime",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xfd3c9144"
+    "type": "function"
   },
   {
     "inputs": [
@@ -500,8 +469,7 @@
     "name": "killPlayer",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xd77f91c7"
+    "type": "function"
   },
   {
     "inputs": [
@@ -512,8 +480,7 @@
     "name": "levelUp",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xc45a7374"
+    "type": "function"
   },
   {
     "inputs": [
@@ -523,128 +490,137 @@
     "name": "levelUpConfig",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x9679b5ba"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "maxGetNum",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x27b64f87"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "maxLevel",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xcc06c359"
+    "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "value", "type": "uint256" },
-      { "internalType": "uint256", "name": "bnxvalue", "type": "uint256" }
-    ],
-    "name": "newPlayer",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xe37a7fff"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" }
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "uint256", "name": "salt", "type": "uint256" }
     ],
     "name": "newPlayerFree",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x2fd3999c"
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "uint256", "name": "request", "type": "uint256" },
+      { "internalType": "uint256", "name": "salt", "type": "uint256" }
+    ],
+    "name": "newPlayerP",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "value", "type": "uint256" },
+      { "internalType": "uint256", "name": "bnxvalue", "type": "uint256" },
+      { "internalType": "uint256", "name": "request", "type": "uint256" }
+    ],
+    "name": "newPlayerTrade",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "payable",
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "oldPlayInfo",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xde044ef7"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "owner",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x8da5cb5b"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "paused",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x5c975abb"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "payAddr",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0xf9fcfe5c"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "payBnxAddr",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x543ae126"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "payBnxValue",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x6a4d832b"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "payValue",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x7649a2f2"
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "playerReqs",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "playerReqsToken",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "receiveAddr",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x3455a9db"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x715018a6"
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "reqsPlayerToken",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -653,8 +629,7 @@
     "name": "revokeAccess",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x85e68531"
+    "type": "function"
   },
   {
     "inputs": [
@@ -664,8 +639,16 @@
     "name": "setAccCareer",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x15eca7bf"
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_bnbValue", "type": "uint256" }
+    ],
+    "name": "setBnbValue",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [
@@ -675,8 +658,7 @@
     "name": "setConfig",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x1a774bfb"
+    "type": "function"
   },
   {
     "inputs": [
@@ -685,8 +667,7 @@
     "name": "setDefaultCareer",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x9028a548"
+    "type": "function"
   },
   {
     "inputs": [
@@ -695,8 +676,7 @@
     "name": "setGasLimit",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xee7d72b4"
+    "type": "function"
   },
   {
     "inputs": [
@@ -705,8 +685,7 @@
     "name": "setIntervalTime",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x0d63e87d"
+    "type": "function"
   },
   {
     "inputs": [
@@ -716,8 +695,7 @@
     "name": "setLevelUpConfig",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x9fa91cce"
+    "type": "function"
   },
   {
     "inputs": [
@@ -726,8 +704,7 @@
     "name": "setMaxGetNum",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xc706b4eb"
+    "type": "function"
   },
   {
     "inputs": [
@@ -736,8 +713,7 @@
     "name": "setMaxLevel",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x344f1ba5"
+    "type": "function"
   },
   {
     "inputs": [
@@ -746,16 +722,14 @@
     "name": "setOldPlayInfo",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x66bb4c41"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "setPaused",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x37a66d85"
+    "type": "function"
   },
   {
     "inputs": [
@@ -764,8 +738,7 @@
     "name": "setPayAddr",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x60d1b489"
+    "type": "function"
   },
   {
     "inputs": [
@@ -774,8 +747,7 @@
     "name": "setPayValue",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xe7cd510c"
+    "type": "function"
   },
   {
     "inputs": [
@@ -784,8 +756,7 @@
     "name": "setReceiveAddr",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xa58696cd"
+    "type": "function"
   },
   {
     "inputs": [
@@ -794,16 +765,14 @@
     "name": "setStartTime",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x3e0a322d"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "setUnPaused",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x349fdb09"
+    "type": "function"
   },
   {
     "inputs": [
@@ -812,8 +781,7 @@
     "name": "setpayBnxAddr",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xdfc22dd7"
+    "type": "function"
   },
   {
     "inputs": [
@@ -822,17 +790,14 @@
     "name": "setpayBnxValue",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0x9e6c5cc0"
+    "type": "function"
   },
   {
     "inputs": [],
     "name": "startTime",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true,
-    "signature": "0x78e97925"
+    "type": "function"
   },
   {
     "inputs": [
@@ -841,7 +806,6 @@
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function",
-    "signature": "0xf2fde38b"
+    "type": "function"
   }
 ]
