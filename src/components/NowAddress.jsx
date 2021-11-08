@@ -1,6 +1,7 @@
 import { IconCopyStroked } from "@douyinfe/semi-icons";
 import { Typography } from "@douyinfe/semi-ui";
 import copy from "copy-to-clipboard";
+import { isMobile } from "../utils/util";
 
 const NowAddress = ({ address }) => {
   return (
@@ -8,14 +9,18 @@ const NowAddress = ({ address }) => {
       style={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: 'center',
         margin: 10,
         flexWrap: "wrap",
         color: "var(--semi-color-text-0)",
       }}
     >
       <span>当前地址:</span>
-      <Typography.Text copyable>{address}</Typography.Text>
+      <Typography.Text
+        copyable
+      >
+        {address}
+      </Typography.Text>
     </div>
   );
 };

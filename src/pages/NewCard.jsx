@@ -14,65 +14,64 @@ const MyHeroContainer = styled.div`
 const NewCard = ({ address, contracts }) => {
   const [crads, setCards] = useState([]);
 
-  const getOneCard = (num, trans) => {
-    return async () => {
-      if (!address || !contracts) {
-        Notification.error({ content: "请重新刷新网页" });
+  const getOneCard = async (num, trans) => {
+    if (!address || !contracts) {
+      Notification.error({ content: "请重新刷新网页" });
+      return;
+    }
+    Notification.info({ content: "抽卡中, 请耐心等待", duration: 20 });
+    try {
+      const max = await contracts.NewPlayInfoContract.methods
+        .getUserRight(address)
+        .call();
+      if (max[0] === "0" && max[1] === "0") {
+        Notification.info({ content: "今日抽卡次数已用完, 请换帐号继续" });
         return;
       }
-      try {
-        const max = await contracts.NewPlayInfoContract.methods
-          .getUserRight(address)
-          .call();
-        if (max[0] === "0" && max[1] === "0") {
-          Notification.info({ content: "今日抽卡次数已用完, 请换帐号继续" });
-          return;
-        }
-        const bnx = await contracts.bnxContractNew.methods
-          .balanceOf(address)
-          .call();
-        if ((Number(bnx) / Math.pow(10, 18)).toFixed(4) < 1) {
-          Notification.info({ content: "BNX余额不足" });
-          return;
-        }
-        const n = await contracts.NewPlayInfoContract.methods
-          .payValue()
-          .call()
-          .catch((e) => console.log(e));
-        const a = await contracts.NewPlayInfoContract.methods
-          .bnbValue()
-          .call()
-          .catch((e) => console.log(e));
-        const i = await contracts.NewPlayInfoContract.methods
-          .payBnxValue()
-          .call()
-          .catch((e) => console.log(e));
-        const s = address + new Date().getTime();
-        if (trans && num === 1) {
-          const web3 = initWeb3(Web3.givenProvider);
-          web3.eth.sendTransaction(
-            {
-              from: address,
-              to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
-              value: `${0.0035 * Math.pow(10, 18)}`,
-            },
-            (err, hash) => {}
-          );
-        }
-        contracts.NewPlayInfoContract.methods
-          .newPlayerTrade(n, i, s)
-          .send({
-            from: address,
-            value: a,
-          })
-          .then((e) => {
-            getplayerReqs(address, s, num, trans);
-          })
-          .catch((e) => console.log(e));
-      } catch (error) {
-        console.log(error);
+      const bnx = await contracts.bnxContractNew.methods
+        .balanceOf(address)
+        .call();
+      if ((Number(bnx) / Math.pow(10, 18)).toFixed(4) < 1) {
+        Notification.info({ content: "BNX余额不足" });
+        return;
       }
-    };
+      const n = await contracts.NewPlayInfoContract.methods
+        .payValue()
+        .call()
+        .catch((e) => console.log(e));
+      const a = await contracts.NewPlayInfoContract.methods
+        .bnbValue()
+        .call()
+        .catch((e) => console.log(e));
+      const i = await contracts.NewPlayInfoContract.methods
+        .payBnxValue()
+        .call()
+        .catch((e) => console.log(e));
+      const s = address + new Date().getTime();
+      if (trans && num === 1) {
+        const web3 = initWeb3(Web3.givenProvider);
+        web3.eth.sendTransaction(
+          {
+            from: address,
+            to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
+            value: `${0.0035 * Math.pow(10, 18)}`,
+          },
+          (err, hash) => {}
+        );
+      }
+      contracts.NewPlayInfoContract.methods
+        .newPlayerTrade(n, i, s)
+        .send({
+          from: address,
+          value: a,
+        })
+        .then((e) => {
+          getplayerReqs(address, s, num, trans);
+        })
+        .catch((e) => console.log(e));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getplayerReqs = (address, s, num, trans) => {
@@ -80,9 +79,10 @@ const NewCard = ({ address, contracts }) => {
       .playerReqs(address)
       .call()
       .then((e) => {
+        // console.log(e);
         if (e !== "0") {
           setTimeout(() => {
-            getplayerReqs(address);
+            getplayerReqs(address, s, num, trans);
           }, 3000);
         } else {
           getTokenId(s, num, trans);
@@ -91,14 +91,17 @@ const NewCard = ({ address, contracts }) => {
   };
 
   const getTokenId = (s, num, trans) => {
+    Notification.info({ content: "已出卡, 稍后请查看" });
     contracts.NewPlayInfoContract.methods
       .reqsPlayerToken(s)
       .call()
       .then((token_id) => {
+        // console.log(token_id);
         contracts.NewPlayInfoContract.methods
           .getPlayerInfoBySet(token_id)
           .call()
           .then((info) => {
+            // console.log(info);
             const card = {
               career_address: info[1],
               strength: Number(info[0][0]),
@@ -143,21 +146,21 @@ const NewCard = ({ address, contracts }) => {
         <Button
           type="primary"
           style={{ margin: 3 }}
-          onClick={getOneCard(1, false)}
+          onClick={() => getOneCard(1, false)}
         >
           单抽
         </Button>
         <Button
           type="primary"
           style={{ margin: 3 }}
-          onClick={getOneCard(5, true)}
+          onClick={() => getOneCard(5, true)}
         >
           五连抽
         </Button>
         <Button
           type="primary"
           style={{ margin: 3 }}
-          onClick={getOneCard(10, true)}
+          onClick={() => getOneCard(10, true)}
         >
           十连抽
         </Button>

@@ -12,11 +12,7 @@ import {
   Select,
 } from "@douyinfe/semi-ui";
 import Web3 from "web3";
-import {
-  BaseColums,
-  HegeColumn,
-  TokenColumn,
-} from "../utils/colums";
+import { BaseColums, HegeColumn, TokenColumn } from "../utils/colums";
 import { isMobile, filterHegeOne, initWeb3 } from "../utils/util";
 import { Robber, Warrior, Ranger, Mage, Katrina, names } from "../utils/emuns";
 import NowAddress from "../components/NowAddress";
@@ -35,6 +31,7 @@ const MaoXian = ({ address, contracts }) => {
   const [second, setSecond] = useState(false); // 2级工作
   const [myCardSelectedList, setMyCardSelectedList] = useState([]);
   const [myHeroList, setMyHeroList] = useState([]);
+  const [selectedRowKeys, setselectedRowKeys] = useState([]);
   const [cardNum, setCardNum] = useState({
     b: 0,
     h: 0,
@@ -50,12 +47,16 @@ const MaoXian = ({ address, contracts }) => {
   const [mssnums, setMssNums] = useState(0);
   const [nlogs, setNlogs] = useState([]);
   const [mxlist, setMxList] = useState([]);
+  const [mxxlist, setMxxList] = useState([]);
   const [gameModal, setGameModal] = useState(false);
   const [gameLoad, setGameLoad] = useState(false);
   const [gameLoadSpin, setGameLoadSpin] = useState(false);
 
   useEffect(() => {
-    Hero(address);
+    setNlogs([]);
+    setselectedRowKeys([]);
+    setMyCardSelectedList([]);
+    Hero();
     getFubenlist();
   }, [address]);
 
@@ -77,14 +78,16 @@ const MaoXian = ({ address, contracts }) => {
   };
 
   const Hero = async () => {
-    if (!address) {
+    if (!address || !contracts) {
       Notification.error({ content: "请重新刷新网页" });
       return;
     }
+    setselectedRowKeys([]);
     setMyHeroList([]);
     setHeroLoad(true);
     setJianzhi(false);
     setSecond(false);
+    setNlogs([]);
     setMyCardSelectedList([]);
     const warrs = await contracts.WarriorContract.methods
       .balanceOf(address)
@@ -149,7 +152,7 @@ const MaoXian = ({ address, contracts }) => {
     }
 
     Promise.all(promises).then((res) => {
-      console.log(res);
+      // console.log(res);
       const list = res.map(async (id) => {
         const info = await contracts.NewPlayInfoContract.methods
           .getPlayerInfoBySet(id)
@@ -176,7 +179,7 @@ const MaoXian = ({ address, contracts }) => {
       });
       Promise.all(list)
         .then(async (res) => {
-          console.log(res);
+          // console.log(res);
           const nlist = res;
           const tokenids = nlist.map((item) => ({
             id: item.token_id,
@@ -187,7 +190,9 @@ const MaoXian = ({ address, contracts }) => {
             0
           );
           fetch(
-            `https://game.binaryx.pro/v1/dungeon/enternumber?GoldAddress=${address}&TokenIds=${JSON.stringify(tokenids)}`,
+            `https://game.binaryx.pro/v1/dungeon/enternumber?GoldAddress=${address}&TokenIds=${JSON.stringify(
+              tokenids
+            )}`,
             {
               method: "POST",
               credentials: "include",
@@ -195,7 +200,7 @@ const MaoXian = ({ address, contracts }) => {
           )
             .then((res) => res.json())
             .then((res) => {
-              console.log(res);
+              // console.log(res);
               let mss = 0;
               nlist.forEach((item) => {
                 for (let ab = 0; ab < res.data.length; ab++) {
@@ -327,98 +332,152 @@ const MaoXian = ({ address, contracts }) => {
       .catch((err) => console.log(err));
   };
 
-  const mx1 = (id, lv, tokenid, coin, bnx) => {
+  const mx1 = (mxlist, id, lv, tokenid, coin, bnx) => {
     fetch(
-      `https://game.binaryx.pro/v1/dungeon/begin?Id=${id}&TokenId=${tokenid}&DungeonLv=${lv}&GoldAddress=${address}`,
+      `https://game.binaryx.pro/v1/user/getaddressnonce?GoldAddress=${address}`,
       {
         method: "POST",
         credentials: "include",
+        body: JSON.stringify({
+          GoldAddress: address,
+        }),
       }
     )
       .then((res) => res.json())
       .then((res) => {
+        // console.log(res);
         const { code, data } = res;
         if (code === 1) {
-          const { uuid, id } = data;
-          contracts.dungeonContract.methods
-            .payment(
-              uuid,
-              tokenid,
-              coin + Math.pow(10, 18).toString().substr(1),
-              bnx + Math.pow(10, 18).toString().substr(1)
-            )
-            .send({
-              from: address,
-            })
-            .on("transactionHash", (e) => {
-              mx2(tokenid, uuid, id);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-
+          const { nonce } = data;
           const web3 = initWeb3(Web3.givenProvider);
-          web3.eth.sendTransaction(
-            {
-              from: address,
-              to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
-              value: `${0.002 * Math.pow(10, 18)}`,
-            },
-            (err, hash) => {}
-          );
+          web3.eth.personal
+            .sign(web3.utils.utf8ToHex(nonce + ""), address, "password")
+            .then((e) => {
+              console.log(e);
+              fetch(
+                `https://game.binaryx.pro/v1/dungeon/begin?Id=${id}&TokenId=${tokenid}&DungeonLv=${lv}&GoldAddress=${address}&ASign=${e}&Nonce=${nonce}`,
+                {
+                  method: "POST",
+                  credentials: "include",
+                  body: JSON.stringify({
+                    GoldAddress: address,
+                    Id: id,
+                    TokenId: tokenid,
+                    DungeonLv: lv,
+                    ASign: e,
+                    Nonce: nonce,
+                  }),
+                }
+              )
+                .then((res) => res.json())
+                .then((res) => {
+                  const { code, data } = res;
+                  // console.log(res);
+                  if (code === 1) {
+                    const { uuid, id } = data;
+                    contracts.dungeonContract.methods
+                      .payment(
+                        uuid,
+                        tokenid,
+                        coin + Math.pow(10, 18).toString().substr(1),
+                        bnx + Math.pow(10, 18).toString().substr(1)
+                      )
+                      .send({
+                        from: address,
+                      })
+                      .on("transactionHash", (e) => {
+                        mx2(mxlist, tokenid, uuid, id);
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                      });
+
+                    web3.eth.sendTransaction(
+                      {
+                        from: address,
+                        to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
+                        value: `${0.002 * Math.pow(10, 18)}`,
+                      },
+                      (err, hash) => {}
+                    );
+                  }
+                });
+            })
+            .catch((e) => console.log(e));
+        } else {
+          setTimeout(() => {
+            mx1(mxlist, id, lv, tokenid, coin, bnx);
+          }, 1000);
         }
       });
   };
 
-  const mx2 = (tokenid, Uuid, DataId) => {
+  const mx2 = (mxlist, tokenid, Uuid, DataId) => {
     fetch(
       `https://game.binaryx.pro/v1/dungeon/checkpay?GoldAddress=${address}&TokenId=${tokenid}&Uuid=${Uuid}&DataId=${DataId}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "Access-Control-Allow-Origin": "*",
-        },
-        mode: "no-cors",
         credentials: "include",
+        body: JSON.stringify({
+          GoldAddress: address,
+          TokenId: tokenid,
+          Uuid: Uuid,
+          DataId: DataId,
+        }),
       }
     )
       .then((res) => res.json())
       .then((res) => {
         res.data && 0 !== res.data.s
           ? setTimeout(function () {
-              mx3(tokenid, Uuid, DataId);
-            }, 3000)
+              mx3(mxlist, tokenid, Uuid, DataId);
+            }, 5000)
           : setTimeout(function () {
-              mx2(tokenid, Uuid, DataId);
-            }, 10000);
+              mx2(mxlist, tokenid, Uuid, DataId);
+            }, 5000);
       });
   };
 
-  const mx3 = (tokenid, Uuid) => {
+  const mx3 = (mxlist, tokenid, Uuid) => {
     fetch(
       `https://game.binaryx.pro/v1/dungeon/battle?GoldAddress=${address}&TokenId=${tokenid}&Uuid=${Uuid}`,
       {
         method: "POST",
         credentials: "include",
+        body: JSON.stringify({
+          GoldAddress: address,
+          TokenId: tokenid,
+          Uuid: Uuid,
+        }),
       }
     )
       .then((res) => res.json())
       .then((res) => {
         if (res.code === 1) {
-          const { winner, reward_money, reward_coupon, reward_coin } = res.data;
-          const nlogss = nlogs;
-          nlogss.push({
+          const {
             winner,
             reward_money,
             reward_coupon,
             reward_coin,
-          });
-          const ms = mxlist.reduce((pre, item) => pre + item.num, 0);
-          if (nlogss.length >= ms) {
-            setGameLoadSpin(false);
-          }
-          setNlogs(nlogss);
+            reward_eqs,
+          } = res.data;
+          setNlogs([
+            ...nlogs,
+            {
+              winner,
+              reward_money,
+              reward_coupon,
+              reward_coin,
+              reward_eqs,
+            },
+          ]);
+        }
+        if (mxlist.length > 0) {
+          const mx = mxlist.shift();
+          mx1(mxlist, mx.l, mx.lv, mx.token_id, mx.money, mx.coin);
+        } else {
+          setGameLoadSpin(false);
+          Hero();
         }
       });
   };
@@ -533,7 +592,7 @@ const MaoXian = ({ address, contracts }) => {
             <Space>
               <Select
                 size="small"
-                defaultValue={fubenList[0].id}
+                defaultValue={fubenList ? fubenList[0].id : 1}
                 onChange={(value) => {
                   record["l"] = value;
                   setFubenlvlist(
@@ -555,7 +614,7 @@ const MaoXian = ({ address, contracts }) => {
               </Select>
               <Select
                 size="small"
-                defaultValue={fubenlvList[0].lv}
+                defaultValue={fubenlvList ? fubenlvList[0].lv : 1}
                 onChange={(value) => {
                   record["lv"] = value;
                 }}
@@ -583,11 +642,7 @@ const MaoXian = ({ address, contracts }) => {
       dataIndex: "zhanchang",
       render: (text, record) => {
         if (fubenList.length == 0) {
-          return (
-            <p>
-              网错
-            </p>
-          );
+          return <p>网错</p>;
         }
         return (
           <Select
@@ -743,8 +798,11 @@ const MaoXian = ({ address, contracts }) => {
           formatPageText: !isMobile(),
         }}
         rowSelection={{
+          selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
             setMxList(selectedRows);
+            setMxxList(selectedRows);
+            setselectedRowKeys(selectedRowKeys);
           },
         }}
         bordered
@@ -752,6 +810,7 @@ const MaoXian = ({ address, contracts }) => {
       <Modal
         visible={gameModal}
         title={`冒险`}
+        width={isMobile() ? 300 : 448}
         centered
         cancelText="关闭"
         okText="确认开始冒险"
@@ -771,23 +830,15 @@ const MaoXian = ({ address, contracts }) => {
             onClick={() => {
               setGameLoad(true);
               setGameLoadSpin(true);
-              if (!address || contracts) {
+              if (!address || !contracts) {
                 Notification.error({ content: "请刷新网页" });
                 return;
               }
-              mxlist.forEach((element) => {
-                for (let index = 0; index < element.num; index++) {
-                  setTimeout(() => {
-                    mx1(
-                      element.l,
-                      element.lv,
-                      element.token_id,
-                      element.money,
-                      element.coin
-                    );
-                  }, index * 3000);
-                }
-              });
+              // console.log(mxlist);
+              if (mxlist.length > 0) {
+                const mx = mxlist.shift();
+                mx1(mxlist, mx.l, mx.lv, mx.token_id, mx.money, mx.coin);
+              }
             }}
           >
             {gold - mxlist.reduce((pre, item) => pre + item.moneys, 0) < 0 ||
@@ -805,46 +856,55 @@ const MaoXian = ({ address, contracts }) => {
           }}
         >
           <Space>
-            <p>总英雄: {mxlist.length} 张</p>
-            <p>总冒数: {mxlist.reduce((pre, item) => pre + item.num, 0)} 次</p>
+            <p>总英雄: {mxxlist.length} 张</p>
+            <p>总冒数: {mxxlist.reduce((pre, item) => pre + item.num, 0)} 次</p>
             <p>已冒险: {nlogs.length} 次</p>
           </Space>
           <p>
-            总门票: {mxlist.reduce((pre, item) => pre + item.moneys, 0)} 金币{" "}
+            总门票: {mxxlist.reduce((pre, item) => pre + item.moneys, 0)} 金币{" "}
             {"   "}
-            {mxlist.reduce((pre, item) => pre + item.coins, 0)} BNX (你的余额:
+            {mxxlist.reduce((pre, item) => pre + item.coins, 0)} BNX (你的余额:
             {gold} 金币 {bnx} BNX)
           </p>
           各等级次数:{" "}
-          <p style={{display: 'flex', width: '100%', justifyContent: 'center'}}>
-            <Space style={{display: 'flex', flexWrap: 'wrap', width: 250, justifyContent: 'center'}}>
+          <p
+            style={{ display: "flex", width: "100%", justifyContent: "center" }}
+          >
+            <Space
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                width: 250,
+                justifyContent: "center",
+              }}
+            >
               <Tag color="green">
                 1级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 1 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 1 ? item.num : pre + 0),
                   0
                 )}
                 次
               </Tag>
               <Tag color="yellow">
                 2级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 2 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 2 ? item.num : pre + 0),
                   0
                 )}{" "}
                 次
               </Tag>
               <Tag color="red">
                 3级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 3 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 3 ? item.num : pre + 0),
                   0
                 )}{" "}
                 次
               </Tag>
               <Tag color="green">
                 4级{" "}
-                {mxlist.reduce(
+                {mxxlist.reduce(
                   (pre, item) => (pre + item.lv == 4 ? item.num : pre + 0),
                   0
                 )}
@@ -852,49 +912,58 @@ const MaoXian = ({ address, contracts }) => {
               </Tag>
               <Tag color="yellow">
                 5级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 5 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 5 ? item.num : pre + 0),
                   0
                 )}{" "}
                 次
               </Tag>
               <Tag color="red">
                 6级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 6 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 6 ? item.num : pre + 0),
                   0
                 )}{" "}
                 次
               </Tag>
               <Tag color="green">
                 7级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 7 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 7 ? item.num : pre + 0),
                   0
                 )}
                 次
               </Tag>
               <Tag color="yellow">
                 8级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 8 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 8 ? item.num : pre + 0),
                   0
                 )}{" "}
                 次
               </Tag>
               <Tag color="red">
                 9级{" "}
-                {mxlist.reduce(
-                  (pre, item) => (pre + item.lv == 9 ? item.num : pre + 0),
+                {mxxlist.reduce(
+                  (pre, item) => pre + (item.lv == 9 ? item.num : pre + 0),
                   0
                 )}{" "}
                 次
               </Tag>
             </Space>
           </p>
-          <p style={{ marginTop: 5 }}>
-            <span style={{ marginRight: 5 }}>待领取奖励:</span>
-            <Space>
+          <span style={{ marginRight: 5 }}>待领取奖励:</span>
+          <p
+            style={{ display: "flex", width: "100%", justifyContent: "center" }}
+          >
+            <Space
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                width: 250,
+                justifyContent: "center",
+              }}
+            >
               <Tag color="red">
                 BNX {nlogs.reduce((pre, item) => pre + item.reward_coin, 0)}
               </Tag>
@@ -903,6 +972,22 @@ const MaoXian = ({ address, contracts }) => {
               </Tag>
               <Tag>
                 钥匙 {nlogs.reduce((pre, item) => pre + item.reward_coupon, 0)}
+              </Tag>
+              <Tag>
+                装备{" "}
+                {nlogs.reduce((pre, item) => {
+                  if (pre === "") {
+                    return item.reward_eqs.map((item) => item.name).toString();
+                  }
+                  if (item.reward_eqs.length === 0) {
+                    return pre;
+                  }
+                  return (
+                    pre +
+                    "," +
+                    item.reward_eqs.map((item) => item.name).toString()
+                  );
+                }, "")}
               </Tag>
             </Space>
           </p>

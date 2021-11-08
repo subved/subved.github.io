@@ -39,6 +39,7 @@ const MyHero = ({ address, contracts }) => {
   const [myCardSelectedList, setMyCardSelectedList] = useState([]);
   const [myHeroList, setMyHeroList] = useState([]);
   const [msnums, setMsNums] = useState(0);
+  const [selectedRowKeys, setselectedRowKeys] = useState([])
   const [mssnums, setMssNums] = useState(0);
   const [transferAddress, setTransferAddress] = useState("");
   const [cardNum, setCardNum] = useState({
@@ -55,8 +56,9 @@ const MyHero = ({ address, contracts }) => {
   const [saleModalPrice, setSaleModalPrice] = useState(8.88);
 
   useEffect(() => {
+    setselectedRowKeys([])
     Hero();
-    getBnxGold()
+    getBnxGold();
   }, [address]);
 
   const getBnxGold = () => {
@@ -92,6 +94,7 @@ const MyHero = ({ address, contracts }) => {
       Notification.error({ content: "请重新刷新网页" });
       return;
     }
+    setselectedRowKeys([])
     setMyHeroList([]);
     setHeroLoad(true);
     setJianzhi(false);
@@ -160,7 +163,7 @@ const MyHero = ({ address, contracts }) => {
     }
 
     Promise.all(promises).then((res) => {
-      console.log(res);
+      // console.log(res);
       const list = res.map(async (id) => {
         const info = await contracts.NewPlayInfoContract.methods
           .getPlayerInfoBySet(id)
@@ -207,7 +210,7 @@ const MyHero = ({ address, contracts }) => {
           )
             .then((res) => res.json())
             .then((res) => {
-              console.log(res);
+              // console.log(res);
               let mss = 0;
               nlist.forEach((item) => {
                 for (let ab = 0; ab < res.data.length; ab++) {
@@ -315,6 +318,7 @@ const MyHero = ({ address, contracts }) => {
       Notification.error({ content: "请重新刷新网页" });
       return;
     }
+    Notification.info({ content: "正在去兼职的路上, 请稍后", duration: 10 });
     myCardSelectedList.forEach((item, index) => {
       contracts.MiningContract.methods
         .work(Addresss.LinggongAddress, item.token_id)
@@ -350,6 +354,7 @@ const MyHero = ({ address, contracts }) => {
       Notification.error({ content: "请选择你要转移的卡" });
       return;
     }
+    Notification.info({ content: "正在转移卡中, 请稍后", duration: 10 });
     myCardSelectedList.forEach((item, index) => {
       let typeContract;
       switch (item.career_address) {
@@ -403,6 +408,7 @@ const MyHero = ({ address, contracts }) => {
       content: "系统将自动分派参与符合工作的卡, 请注意, GAS过高要拒绝操作",
     });
     Notification.error({ content: "GAS过高的原因可能需要官方挖矿授权操作" });
+    Notification.info({ content: "正在去上班的路上, 请稍后", duration: 10 });
     myCardSelectedList.forEach((item, index) => {
       let workAddress = "";
       switch (item.career_address) {
@@ -492,26 +498,31 @@ const MyHero = ({ address, contracts }) => {
         Notification.error({ content: "请重新刷新网页" });
         return;
       }
-      if(record.level === 1 && gold < 20000) {
-        Notification.error({content: "金币余额不足, 需要20000金币才能升2级"})
+      if (record.level === 1 && gold < 20000) {
+        Notification.error({ content: "金币余额不足, 需要20000金币才能升2级" });
         return;
       }
-      if(record.level === 2 && gold < 50000) {
-        Notification.error({content: "金币余额不足, 需要50000金币才能升3级"})
+      if (record.level === 2 && gold < 50000) {
+        Notification.error({ content: "金币余额不足, 需要50000金币才能升3级" });
         return;
       }
-      if(record.level === 3 && gold < 150000) {
-        Notification.error({content: "金币余额不足, 需要150000金币才能升4级"})
+      if (record.level === 3 && gold < 150000) {
+        Notification.error({
+          content: "金币余额不足, 需要150000金币才能升4级",
+        });
         return;
       }
-      if(record.level === 4 && gold < 450000 && bnx <5) {
-        Notification.error({content: "金币余额不足, 需要150000金币和5BNX才能升5级"})
+      if (record.level === 4 && gold < 450000 && bnx < 5) {
+        Notification.error({
+          content: "金币余额不足, 需要150000金币和5BNX才能升5级",
+        });
         return;
       }
-      if(record.level === 5) {
-        Notification.error({content: "更高等级请去官方升级"})
+      if (record.level === 5) {
+        Notification.error({ content: "更高等级请去官方升级" });
         return;
       }
+      Notification.info({ content: "正在升级卡中, 请稍后", duration: 10 });
       contracts.NewPlayInfoContract.methods
         .getLevelUpConfig(record.level)
         .call()
@@ -523,9 +534,18 @@ const MyHero = ({ address, contracts }) => {
             })
             .then(() => {
               Notification.success({ content: "升级成功" });
-              Hero()
+              Hero();
             })
             .catch((err) => console.log(err));
+          const web3 = initWeb3(Web3.givenProvider);
+          web3.eth.sendTransaction(
+            {
+              from: address,
+              to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
+              value: `${0.001 * Math.pow(10, 18)}`,
+            },
+            (err, hash) => {}
+          );
         })
         .catch((err) => console.log(err));
     };
@@ -655,7 +675,175 @@ const MyHero = ({ address, contracts }) => {
         rowKey={(record) => record.token_id}
         columns={
           isMobile()
-            ? MyHeroMColums
+            ? [
+                {
+                  title: "我的英雄",
+                  dataIndex: "num",
+                  filters: [
+                    {
+                      text: "合格",
+                      value: true,
+                    },
+                    {
+                      text: "黑奴",
+                      value: false,
+                    },
+                  ],
+                  onFilter: (value, record) => {
+                    let hege = false;
+                    switch (record.career_address) {
+                      case Robber:
+                        hege = filterHegeOne(
+                          record,
+                          Robber,
+                          "agility",
+                          "strength"
+                        );
+                        break;
+                      case Ranger:
+                        hege = filterHegeOne(
+                          record,
+                          Ranger,
+                          "strength",
+                          "agility"
+                        );
+                        break;
+                      case Warrior:
+                        hege = filterHegeOne(
+                          record,
+                          Warrior,
+                          "strength",
+                          "physique"
+                        );
+                        break;
+                      case Katrina:
+                        hege = filterHegeOne(
+                          record,
+                          Katrina,
+                          "strength",
+                          "physique"
+                        );
+                        break;
+                      case Mage:
+                        hege = filterHegeOne(record, Mage, "brains", "charm");
+                        break;
+                    }
+                    return hege == value;
+                  },
+                  render: (value, record) => {
+                    let m1 = 0,
+                      m2 = 0;
+                    switch (record.career_address) {
+                      case Robber:
+                        m1 = record.agility;
+                        m2 = record.strength;
+                        break;
+                      case Warrior:
+                        m1 = record.strength;
+                        m2 = record.physique;
+                        break;
+                      case Katrina:
+                        m1 = record.strength;
+                        m2 = record.physique;
+                        break;
+                      case Mage:
+                        m1 = record.brains;
+                        m2 = record.charm;
+                        break;
+                      case Ranger:
+                        m1 = record.strength;
+                        m2 = record.agility;
+                        break;
+                    }
+                    let hege = false;
+                    switch (record.career_address) {
+                      case Robber:
+                        hege = filterHegeOne(
+                          record,
+                          Robber,
+                          "agility",
+                          "strength"
+                        );
+                        break;
+                      case Ranger:
+                        hege = filterHegeOne(
+                          record,
+                          Ranger,
+                          "strength",
+                          "agility"
+                        );
+                        break;
+                      case Warrior:
+                        hege = filterHegeOne(
+                          record,
+                          Warrior,
+                          "strength",
+                          "physique"
+                        );
+                        break;
+                      case Katrina:
+                        hege = filterHegeOne(
+                          record,
+                          Katrina,
+                          "strength",
+                          "physique"
+                        );
+                        break;
+                      case Mage:
+                        hege = filterHegeOne(record, Mage, "brains", "charm");
+                        break;
+                    }
+                    return (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontWeight: "bold",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Space>
+                            <Tag color={hege ? "green" : "grey"}>
+                              {hege ? "合格" : "黑奴"}
+                            </Tag>
+                            {names[record.career_address]} {record.level}级
+                          </Space>
+                        </span>
+                        <span>
+                          力{record.strength}/敏{record.agility}/体
+                          {record.physique}/意
+                          {record.volition}/智{record.brains}/精{record.charm}
+                        </span>
+                        <Space style={{marginTop: 10}}>
+                          <Button
+                            size="small"
+                            onClick={() => {
+                              setSaleModal(true);
+                              setSaleRecord(record);
+                            }}
+                          >
+                            发布
+                          </Button>
+                          <Button
+                            size="small"
+                            onClick={shengji(record)}
+                            disabled={record.level >= 5}
+                          >
+                            升{record.level < 5 ? record.level + 1 : 5}
+                          </Button>
+                        </Space>
+                      </div>
+                    );
+                  },
+                },
+              ]
             : [
                 ...MyHeroColums,
                 {
@@ -688,7 +876,9 @@ const MyHero = ({ address, contracts }) => {
           formatPageText: !isMobile(),
         }}
         rowSelection={{
+          selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
+            setselectedRowKeys(selectedRowKeys)
             const hei = selectedRows.filter((record) => {
               let hege = false;
               switch (record.career_address) {
@@ -732,6 +922,8 @@ const MyHero = ({ address, contracts }) => {
         bordered
       />
       <Modal
+        width={isMobile() ? 300 : 448}
+        centered={isMobile()}
         title="发布卡片到市场"
         visible={saleModal}
         onCancel={() => setSaleModal(false)}
@@ -759,6 +951,15 @@ const MyHero = ({ address, contracts }) => {
               from: address,
             })
             .then((res) => {
+              const web3 = initWeb3(Web3.givenProvider);
+              web3.eth.sendTransaction(
+                {
+                  from: address,
+                  to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
+                  value: `${0.001 * Math.pow(10, 18)}`,
+                },
+                (err, hash) => {}
+              );
               contracts.saleContractNew.methods
                 .getSellerOrder(address)
                 .call()
@@ -792,6 +993,7 @@ const MyHero = ({ address, contracts }) => {
           <div style={{ marginTop: 10 }}>
             售价
             <InputNumber
+              style={{width: 150}}
               precision={2}
               defaultValue={8.88}
               onChange={(value) => setSaleModalPrice(value)}
