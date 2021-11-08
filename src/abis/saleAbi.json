@@ -209,7 +209,6 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" },
       { "internalType": "uint256", "name": "orderId", "type": "uint256" }
     ],
     "name": "buyPlayer",

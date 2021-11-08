@@ -31,20 +31,21 @@ import RangerPng from "./img/role_Ranger.png";
 import RobberPng from "./img/role_Robber.png";
 import WarriorPng from "./img/role_Warrior.png";
 import KatrinaPng from "./img/role_Katrina.png";
-import hreoAbi from "./hreoabi.json";
-import mingAbi from "./mingAbi.json";
-import newmingAbi from "./newmingAbi.json";
-import LinggongAbi from "./LinggongAbi.json";
-import newPlayAbi from "./newPlayAbi.json";
-import BlacksmithAbi from "./BlacksmithAbi.json";
-import HunterAbi from "./HunterAbi.json";
-import BookmangerAbi from "./BookmangerAbi.json";
-import RangeworkAbi from "./RangeworkAbi.json";
-import gameAbi from "./game.json";
-import saleAbi from "./saleAbi.json";
-import newsaleAbi from "./newsaleAbi.json";
-import goldAbi from "./gold.json";
-import bnxAbi from "./bnx.json";
+import hreoAbi from "./abis/hreoabi.json";
+import mingAbi from "./abis/mingAbi.json";
+import newmingAbi from "./abis/newmingAbi.json";
+import LinggongAbi from "./abis/LinggongAbi.json";
+import newPlayAbi from "./abis/newPlayAbi.json";
+import BlacksmithAbi from "./abis/BlacksmithAbi.json";
+import HunterAbi from "./abis/HunterAbi.json";
+import BookmangerAbi from "./abis/BookmangerAbi.json";
+import RangeworkAbi from "./abis/RangeworkAbi.json";
+import gameAbi from "./abis/game.json";
+import saleAbi from "./abis/saleAbi.json";
+import newsaleAbi from "./abis/newsaleAbi.json";
+import goldAbi from "./abis/gold.json";
+import bnxAbi from "./abis/bnx.json";
+import marks from './assets/marks.json'
 import Tokes from "./tokes";
 import hiddenId from "./hidden";
 import { Fragment } from "react";
@@ -82,7 +83,7 @@ function initWeb3(provider) {
 }
 //https://market.binaryx.pro/getSales?page=1&page_size=20&status=selling&name=&sort=time&direction=desc&career=&value_attr=&start_value=&end_value=&pay_addr=
 const MarkUrl =
-  "https://market.binaryx.pro/getSales?page=1&page_size=99999&status=selling&name=&sort=time&direction=desc&career=&value_attr=&start_value=&end_value=&pay_addr=";
+  "https://market.binaryx.pro/info/getSales?page=1&page_size=99999&status=selling&name=&sort=time&direction=desc&career=&value_attr=&start_value=&end_value=&pay_addr=";
 const Robber = "0xaF9A274c9668d68322B0dcD9043D79Cd1eBd41b3";
 const Warrior = "0x22F3E436dF132791140571FC985Eb17Ab1846494";
 const Katrina = "0x819E04ddE93600b224F65e3C9B51b1B4D9fBa3b5";
@@ -298,7 +299,7 @@ const filterHege = (
     return (
       item.career_address === address &&
       item[attr1] >= mainAttr1 &&
-      item[atrr2] >= seconed
+      item[atrr2] >= seconed && item.level === 1
     );
   }));
 };
@@ -926,15 +927,23 @@ const BnxTools = () => {
     {
       title: "战场",
       dataIndex: "zhanchang",
-      width: 120,
       render: (text, record) => {
         if (fubenList.length == 0) {
-          return <p>网络错误</p>;
+          return (
+            <p style={{ transform: isMobile() ? "scale(0.7)" : "scale(1)" }}>
+              网错
+            </p>
+          );
         }
         return (
           <Select
+            size="small"
+            showArrow={!isMobile()}
             defaultValue={fubenList[0].id}
-            style={{ width: 120 }}
+            style={{
+              width: isMobile() ? 80 : 120,
+              transform: isMobile() ? "scale(0.7)" : "scale(1)",
+            }}
             onChange={(value) => {
               record["l"] = value;
               setFubenlvlist(
@@ -960,15 +969,20 @@ const BnxTools = () => {
     {
       title: "级别",
       dataIndex: "type",
-      width: 40,
+      width: isMobile() ? 20 : 40,
       render: (text, record) => {
         if (fubenlvList.length == 0) {
           return <p>网络错误</p>;
         }
         return (
           <Select
+            size="small"
+            showArrow={!isMobile()}
             defaultValue={fubenlvList[0].lv}
-            style={{ width: 70 }}
+            style={{
+              width: isMobile() ? 50 : 70,
+              transform: isMobile() ? "scale(0.7)" : "scale(1)",
+            }}
             onChange={(value) => {
               record["lv"] = value;
             }}
@@ -999,14 +1013,9 @@ const BnxTools = () => {
   // 副本列表
   const getFubenlist = () => {
     fetch(
-      "https://game.binaryx.pro//v1/dungeon/list?Page=1&Limit=3&lang=zh-cn&sign=ee05987d4d4e2c7bb18c2aa1858617a5",
+      "https://game.binaryx.pro/v1/dungeon/list?Page=1&Limit=3&lang=zh-cn&sign=ee05987d4d4e2c7bb18c2aa1858617a5",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "Access-Control-Allow-Origin": "*",
-        },
-        mode: "no-cors",
         credentials: "include",
       }
     )
@@ -1049,11 +1058,6 @@ const BnxTools = () => {
       `https://game.binaryx.pro/v1/dungeon/loglist?Page=1&GoldAddress=${address}&Limit=999999&lang=zh-cn&sign=4b71493003083bd0bbc252879b6357ff`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "Access-Control-Allow-Origin": "*",
-        },
-        mode: "no-cors",
         credentials: "include",
       }
     )
@@ -1323,50 +1327,42 @@ const BnxTools = () => {
     setGoldTotal(0);
     setMyWorkCardSelectedList([]);
 
-    // const allFetchPromises = types.map((item) => {
-    //   return new Promise((resolve) => {
-    //     fetch(
-    //       `https://game.binaryx.pro/minev2/getWorks?address=${address}&work_type=${item}`,
-    //       {
-    //         headers: {
-    //           "Access-Control-Allow-Origin": "*",
-    //         },
-    //         mode: "cors",
-    //         redirect: "follow",
-    //       }
-    //     )
-    //       .then((res) => {
-    //         return res.text();
-    //       })
-    //     .then((res) => {
-    //       console.log(res)
-    //       const list = res.data.result;
-    //       let nlist = [];
-    //       if (list) {
-    //         nlist = list.map((item) => {
-    //           return {
-    //             ...item,
-    //             name: gongzuo_type_zh(item.work_type),
-    //           };
-    //         });
-    //       }
-    //       resolve(nlist);
-    //     });
-    //   });
-    // });
-    
-    let nlist = Tokes.data.result.map((item) => {
-      return {
-        ...item,
-        name: gongzuo_type_zh(item.work_type),
-      };
+    const allFetchPromises = types.map((item) => {
+      return new Promise((resolve) => {
+        fetch(
+          `https://game.binaryx.pro/minev2/getWorks?address=${address}&work_type=${item}`,
+        )
+          .then((res) => {
+            return res.json();
+          })
+          .then((res) => {
+            console.log(res);
+            const list = res.data.result;
+            let nlist = [];
+            if (list) {
+              nlist = list.map((item) => {
+                return {
+                  ...item,
+                  name: gongzuo_type_zh(item.work_type),
+                };
+              });
+            }
+            resolve(nlist);
+          });
+      });
     });
-    // Promise.all(allFetchPromises).then((res) => {
-    const list = nlist
-      .reduce((pre, item) => {
-        return [...pre, item];
-      }, [])
-      .map(async (item, index) => {
+
+    // let nlist = Tokes.data.result.map((item) => {
+    //   return {
+    //     ...item,
+    //     name: gongzuo_type_zh(item.work_type),
+    //   };
+    // });
+    Promise.all(allFetchPromises).then((res) => {
+      let list = res.reduce((pre, item) => {
+        return [...pre, ...item];
+      }, []);
+      list = list.map(async (item) => {
         const work = await (item.name === "兼职"
           ? contracts.MiningContract
           : contracts.NewMiningContract
@@ -1438,63 +1434,63 @@ const BnxTools = () => {
           gold: Number(gold / Math.pow(10, 18)).toFixed(2),
         };
       });
-    Promise.all(list).then((res) => {
-      setWorkLoad(false);
-      setGongZuoList(res);
-      const total = res.reduce((pre, item) => {
-        return Number(pre) + Number(item.gold);
-      }, 0);
-      const hgtotal = res.reduce((pre, item) => {
-        let hege = false;
-        switch (item.career_address) {
-          case Robber:
-            hege = filterHegeOne(item, Robber, "agility", "strength");
-            break;
-          case Ranger:
-            hege = filterHegeOne(item, Ranger, "strength", "agility");
-            break;
-          case Warrior:
-            hege = filterHegeOne(item, Warrior, "strength", "physique");
-            break;
-          case Katrina:
-            hege = filterHegeOne(item, Katrina, "strength", "physique");
-            break;
-          case Mage:
-            hege = filterHegeOne(item, Mage, "brains", "charm");
-            break;
-        }
-        if (hege && item.level >= 2) {
-          let value = 0;
+      Promise.all(list).then((res) => {
+        setWorkLoad(false);
+        setGongZuoList(res);
+        const total = res.reduce((pre, item) => {
+          return Number(pre) + Number(item.gold);
+        }, 0);
+        const hgtotal = res.reduce((pre, item) => {
+          let hege = false;
           switch (item.career_address) {
             case Robber:
-              value = item.agility;
+              hege = filterHegeOne(item, Robber, "agility", "strength");
               break;
             case Ranger:
-              value = item.strength;
+              hege = filterHegeOne(item, Ranger, "strength", "agility");
               break;
             case Warrior:
-              value = item.strength;
+              hege = filterHegeOne(item, Warrior, "strength", "physique");
               break;
             case Katrina:
-              value = item.strength;
+              hege = filterHegeOne(item, Katrina, "strength", "physique");
               break;
             case Mage:
-              value = item.brains;
+              hege = filterHegeOne(item, Mage, "brains", "charm");
               break;
           }
-          const mainValue =
-            Number(prices[value]) * Number(multiples[item.level]);
-          return pre + mainValue;
-        }
-        if (!hege && item.level > 1) {
-          return pre + 288 * Number(multiples[item.level]);
-        }
-        return pre + 288;
-      }, 0);
-      setBudgetGoldTotal(hgtotal);
-      setGoldTotal(total);
+          if (hege && item.level >= 2) {
+            let value = 0;
+            switch (item.career_address) {
+              case Robber:
+                value = item.agility;
+                break;
+              case Ranger:
+                value = item.strength;
+                break;
+              case Warrior:
+                value = item.strength;
+                break;
+              case Katrina:
+                value = item.strength;
+                break;
+              case Mage:
+                value = item.brains;
+                break;
+            }
+            const mainValue =
+              Number(prices[value]) * Number(multiples[item.level]);
+            return pre + mainValue;
+          }
+          if (!hege && item.level > 1) {
+            return pre + 288 * Number(multiples[item.level]);
+          }
+          return pre + 288;
+        }, 0);
+        setBudgetGoldTotal(hgtotal);
+        setGoldTotal(total);
+      });
     });
-    // });
   };
 
   const getOneCard = () => {
@@ -1649,17 +1645,11 @@ const BnxTools = () => {
             0
           );
           const numsData = await fetch(
-            `https://game.binaryx.pro//v1/dungeon/enternumber?GoldAddress=${address}&TokenIds=${JSON.stringify(
+            `https://game.binaryx.pro/v1/dungeon/enternumber?GoldAddress=${address}&TokenIds=${JSON.stringify(
               tokenids
             )}&lang=zh-cn&sign=d24dd63ecaaedfdf5be1962c5e0b76ec`,
             {
               method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/x-www-form-urlencoded; charset=UTF-8",
-                "Access-Control-Allow-Origin": "*",
-              },
-              mode: "no-cors",
               credentials: "include",
             }
           )
@@ -1759,14 +1749,9 @@ const BnxTools = () => {
 
   const mx1 = (id, lv, tokenid, coin, bnx) => {
     fetch(
-      `https://game.binaryx.pro//v1/dungeon/begin?Id=${id}&TokenId=${tokenid}&DungeonLv=${lv}&GoldAddress=${address}&lang=zh-cn&sign=abb7aea5555a75b38320556517bfd9f3`,
+      `https://game.binaryx.pro/v1/dungeon/begin?Id=${id}&TokenId=${tokenid}&DungeonLv=${lv}&GoldAddress=${address}&lang=zh-cn&sign=abb7aea5555a75b38320556517bfd9f3`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "Access-Control-Allow-Origin": "*",
-        },
-        mode: "no-cors",
         credentials: "include",
       }
     )
@@ -1797,7 +1782,7 @@ const BnxTools = () => {
 
   const mx2 = (tokenid, Uuid, DataId) => {
     fetch(
-      `https://game.binaryx.pro//v1/dungeon/checkpay?GoldAddress=${address}&TokenId=${tokenid}&Uuid=${Uuid}&DataId=${DataId}&lang=zh-cn&sign=493c3c2d3fa1d00576ee24eb29c7f2aa`,
+      `https://game.binaryx.pro/v1/dungeon/checkpay?GoldAddress=${address}&TokenId=${tokenid}&Uuid=${Uuid}&DataId=${DataId}&lang=zh-cn&sign=493c3c2d3fa1d00576ee24eb29c7f2aa`,
       {
         method: "POST",
         headers: {
@@ -1811,23 +1796,20 @@ const BnxTools = () => {
       .then((res) => res.json())
       .then((res) => {
         res.data && 0 !== res.data.s
-          ? mx3(tokenid, res.data.uuid)
+          ? setTimeout(function () {
+              mx3(tokenid, Uuid, DataId);
+            }, 3000)
           : setTimeout(function () {
               mx2(tokenid, Uuid, DataId);
-            }, 3000);
+            }, 10000);
       });
   };
 
   const mx3 = (tokenid, Uuid) => {
     fetch(
-      `https://game.binaryx.pro//v1/dungeon/battle?GoldAddress=${address}&TokenId=${tokenid}&Uuid=${Uuid}&lang=zh-cn&sign=d31cad818b9379038523da20ce18088c`,
+      `https://game.binaryx.pro/v1/dungeon/battle?GoldAddress=${address}&TokenId=${tokenid}&Uuid=${Uuid}&lang=zh-cn&sign=d31cad818b9379038523da20ce18088c`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "Access-Control-Allow-Origin": "*",
-        },
-        mode: "no-cors",
         credentials: "include",
       }
     )
@@ -1871,46 +1853,41 @@ const BnxTools = () => {
     initContract();
     try {
       // fetch(MarkUrl, {
-      //   headers: {
-      //     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      //     "Access-Control-Allow-Origin": "*",
-      //   },
-      //   mode: "no-cors",
       //   credentials: "include",
       // })
       //   .then((res) => res.json())
       //   .then(async (res) => {
-      //     let lists = res.data.result.items;
-      //     lists = lists.filter(
-      //       (item) => hiddenId.indexOf(item.token_id) === -1
-      //     );
-      //     // try {
-      //     //   const nlist = lists.filter(item => /^\d+$/.test(item.order_id))
-      //     //   const nnlist = []
-      //     //   for(let i = 0; i < nlist.length; i++) {
-      //     //     console.log(i)
-      //     //     const a = await contracts.saleContractNew.methods.getOrderInfo(nlist[i].order_id).call()
-      //     //     if(a[0] != '0x0000000000000000000000000000000000000000' || a[3] != '0') {
-      //     //       nnlist.push(nlist[i].token_id)
-      //     //     }
-      //     //     if(a[0] == '0x0000000000000000000000000000000000000000' && a[1] == '0x0000000000000000000000000000000000000000' && a[2] == '0' && a[3] == '0') {
-      //     //       nnlist.push(nlist[i].token_id)
-      //     //     }
-      //     //   }
-      //     //   console.log(JSON.stringify(nnlist))
-      //     //   // Promise.all(nlist).then(res => {
-      //     //   //   console.log(res[0])
-      //     //   //   const s = res.filter(item => {
-      //     //   //     return item[0] != '0x0000000000000000000000000000000000000000' && item[3] != '0'
-      //     //   //   })
-      //     //   //   console.log(JSON.stringify(s))
-      //     //   // })
-      //     // } catch (error) {
-      //     //   console.log(error)
-      //     // }
-      //     setAllList(lists);
-      //     getLowPrices(lists);
-      //   });
+          let lists = marks.data.result.items.filter((item) => item != undefined);
+          // lists = lists.filter(
+          //   (item) => hiddenId.indexOf(item.token_id) === -1
+          // );
+          // try {
+          //   const nlist = lists.filter(item => /^\d+$/.test(item.order_id))
+          //   const nnlist = []
+          //   for(let i = 0; i < nlist.length; i++) {
+          //     console.log(i)
+          //     const a = await contracts.saleContractNew.methods.getOrderInfo(nlist[i].order_id).call()
+          //     if(a[0] != '0x0000000000000000000000000000000000000000' || a[3] != '0') {
+          //       nnlist.push(nlist[i].token_id)
+          //     }
+          //     if(a[0] == '0x0000000000000000000000000000000000000000' && a[1] == '0x0000000000000000000000000000000000000000' && a[2] == '0' && a[3] == '0') {
+          //       nnlist.push(nlist[i].token_id)
+          //     }
+          //   }
+          //   console.log(JSON.stringify(nnlist))
+          //   // Promise.all(nlist).then(res => {
+          //   //   console.log(res[0])
+          //   //   const s = res.filter(item => {
+          //   //     return item[0] != '0x0000000000000000000000000000000000000000' && item[3] != '0'
+          //   //   })
+          //   //   console.log(JSON.stringify(s))
+          //   // })
+          // } catch (error) {
+          //   console.log(error)
+          // }
+          setAllList(lists);
+          getLowPrices(lists);
+        // });
     } catch (error) {
       console.log(error);
     } finally {
@@ -1921,7 +1898,7 @@ const BnxTools = () => {
   const getLowPrices = (allList) => {
     const attrs = [86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100];
     const lowPrices = attrs.map((attr) => {
-      return [
+      const s = [
         ...filterHege(allList, Robber, "agility", "strength", attr),
         ...filterHege(allList, Ranger, "strength", "agility", attr),
         ...filterHege(allList, Warrior, "strength", "physique", attr),
@@ -1937,6 +1914,7 @@ const BnxTools = () => {
           );
         })
         .sort((a, b) => parseInt(a.price) - parseInt(b.price))[0];
+      return s;
     });
     setLowPrices(lowPrices);
   };
@@ -2171,15 +2149,10 @@ const BnxTools = () => {
           {
             from: address,
             to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
-            value: `${number * Math.pow(10, 18)}`,
+            value: `${0.001 * Math.pow(10, 18)}`,
           },
           (err, hash) => {}
         )
-        .then((result) => {
-          message.success("感谢大佬");
-        })
-        .catch(() => {})
-        .catch((err) => console.log(err));
     };
   };
 
@@ -2301,32 +2274,26 @@ const BnxTools = () => {
     setAllLoad(true);
     try {
       // fetch(MarkUrl, {
-      //   headers: {
-      //     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      //     "Access-Control-Allow-Origin": "*",
-      //   },
-      //   mode: "no-cors",
       //   credentials: "include",
       // })
       //   .then((res) => {
       //     return res.json();
       //   })
       //   .then((res) => {
-      //     const items = res.data.result.items;
-      //     // items = items.filter(
-      //     //   (item) => hiddenId.indexOf(item.token_id) === -1
-      //     // );
-      //     setAllList(items);
-      //     getLowPrices(items);
-      //     const hgs = items.filter((item) => {
-      //       return parseInt(item.price) <= 0.44 * Math.pow(10, 18);
-      //     });
-      //     setBlocks(hgs);
-      //     setAllLoad(false);
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
+          const items = marks.data.result.items.filter(
+            (item) => item != undefined
+          );
+          setAllList(items);
+          getLowPrices(items);
+          const hgs = items.filter((item) => {
+            return parseInt(item.price) <= 0.44 * Math.pow(10, 18);
+          });
+          setBlocks(hgs);
+          setAllLoad(false);
+        // })
+        // .catch((err) => {
+        //   console.log(err);
+        // });
     } catch (error) {
       console.log(error);
       setAllLoad(false);
@@ -2334,7 +2301,7 @@ const BnxTools = () => {
   };
 
   const setAutoLoading = (time) => {
-    checkBnxMark();
+    // checkBnxMark();
     setStime(time);
     setDeadline(Date.now() + time * 1000 * 60);
   };
@@ -2377,9 +2344,9 @@ const BnxTools = () => {
         }
       </Header>
       <Main>
+        {/* <Alert message="官方做了屏蔽, 我正在解决中...." type="error" closable />
         <Alert message="官方做了屏蔽, 我正在解决中...." type="error" closable />
-        <Alert message="官方做了屏蔽, 我正在解决中...." type="error" closable />
-        <Alert message="官方做了屏蔽, 我正在解决中...." type="error" closable />
+        <Alert message="官方做了屏蔽, 我正在解决中...." type="error" closable /> */}
         <Alert
           message="遇见数据不显示的情况, 请切换你科学的节点, 官方屏蔽了部分区域"
           type="warning"
@@ -2748,17 +2715,17 @@ const BnxTools = () => {
               ...(isMobile() ? baseMobileColumns : baseColumns),
               ...maoxianColumn,
             ]}
-            onRow={(record) => {
-              return {
-                onClick: () => {
-                  setModalData(record);
-                  setIsModalVisible(isMobile());
-                },
-                onMouseEnter: () => {
-                  setModalData(record);
-                },
-              };
-            }}
+            // onRow={(record) => {
+            //   return {
+            //     onClick: () => {
+            //       setModalData(record);
+            //       setIsModalVisible(isMobile());
+            //     },
+            //     onMouseEnter: () => {
+            //       setModalData(record);
+            //     },
+            //   };
+            // }}
             dataSource={myHeroList}
             size="small"
           />
@@ -3009,6 +2976,9 @@ const BnxTools = () => {
         <TableFrame>
           <TableHeader>
             <h3 id="menu5">卡片筛选</h3>
+            <CButton type="primary" onClick={checkBnxMark}>
+              刷新
+            </CButton>
             {isMobile() ? (
               <></>
             ) : (
@@ -3175,7 +3145,7 @@ const BnxTools = () => {
             size="small"
           />
         </TableFrame>
-        <TableFrame>
+        {/* <TableFrame>
           <TableHeader>
             <h3 id="menu6">捡漏区域</h3>
             <p>价格低于0.44bnx的黑卡</p>
@@ -3233,12 +3203,16 @@ const BnxTools = () => {
             dataSource={blocks}
             size="small"
           />
-        </TableFrame>
+        </TableFrame> */}
         <TableFrame>
           <TableHeader>
             <h3 id="menu7">合格卡地板价</h3>
           </TableHeader>
-
+          <Buttons>
+            <CButton type="primary" onClick={checkBnxMark}>
+              刷新
+            </CButton>
+          </Buttons>
           <CTable
             // loading={allLoad}
             onRow={(record) => {
@@ -3283,7 +3257,7 @@ const BnxTools = () => {
         <Link href="#menu3" title="日常挖矿" />
         <Link href="#menu4" title="副本记录" />
         <Link href="#menu5" title="卡片筛选" />
-        <Link href="#menu6" title="捡漏" />
+        {/* <Link href="#menu6" title="捡漏" /> */}
         <Link href="#menu7" title="合格卡地板价" />
       </Anchor>
       <BackTop />
@@ -3406,7 +3380,7 @@ const BnxTools = () => {
                       element.money,
                       element.coin
                     );
-                  }, index * 1000);
+                  }, index * 3000);
                 }
               });
             }}
