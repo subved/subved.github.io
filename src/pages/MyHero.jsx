@@ -39,7 +39,7 @@ const MyHero = ({ address, contracts }) => {
   const [myCardSelectedList, setMyCardSelectedList] = useState([]);
   const [myHeroList, setMyHeroList] = useState([]);
   const [msnums, setMsNums] = useState(0);
-  const [selectedRowKeys, setselectedRowKeys] = useState([])
+  const [selectedRowKeys, setselectedRowKeys] = useState([]);
   const [mssnums, setMssNums] = useState(0);
   const [transferAddress, setTransferAddress] = useState("");
   const [cardNum, setCardNum] = useState({
@@ -52,18 +52,18 @@ const MyHero = ({ address, contracts }) => {
   const [Inkey, setInKey] = useState(0);
   const [gold, setGold] = useState(0);
   const [saleModal, setSaleModal] = useState(false);
-  const [saleRecord, setSaleRecord] = useState({});
+  const [saleRecord, setSaleRecord] = useState([]);
   const [saleModalPrice, setSaleModalPrice] = useState(8.88);
 
   useEffect(() => {
-    setselectedRowKeys([])
+    setselectedRowKeys([]);
     Hero();
     getBnxGold();
   }, [address]);
 
   const getBnxGold = () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     contracts.goldContractNew.methods
@@ -91,10 +91,10 @@ const MyHero = ({ address, contracts }) => {
 
   const Hero = async () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
-    setselectedRowKeys([])
+    setselectedRowKeys([]);
     setMyHeroList([]);
     setHeroLoad(true);
     setJianzhi(false);
@@ -315,7 +315,7 @@ const MyHero = ({ address, contracts }) => {
   };
   const toJianZhi = () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     Notification.info({ content: "正在去兼职的路上, 请稍后", duration: 10 });
@@ -343,7 +343,7 @@ const MyHero = ({ address, contracts }) => {
 
   const toTransfer = () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     if (transferAddress === "") {
@@ -401,7 +401,7 @@ const MyHero = ({ address, contracts }) => {
 
   const toSecond = () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     Notification.error({
@@ -495,7 +495,7 @@ const MyHero = ({ address, contracts }) => {
   const shengji = (record) => {
     return () => {
       if (!address || !contracts) {
-        Notification.error({ content: "请重新刷新网页" });
+        Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
         return;
       }
       if (record.level === 1 && gold < 20000) {
@@ -599,6 +599,17 @@ const MyHero = ({ address, contracts }) => {
           onClick={toSecond}
         >
           二级工作
+        </Button>
+        <Button
+          type="primary"
+          style={{ margin: 3 }}
+          disabled={myCardSelectedList.length === 0}
+          onClick={() => {
+            setSaleModal(true);
+            setSaleRecord(myCardSelectedList);
+          }}
+        >
+          批量发布
         </Button>
         <Button type="primary" style={{ margin: 3 }} onClick={Hero}>
           刷新
@@ -821,12 +832,12 @@ const MyHero = ({ address, contracts }) => {
                           {record.physique}/意
                           {record.volition}/智{record.brains}/精{record.charm}
                         </span>
-                        <Space style={{marginTop: 10}}>
+                        <Space style={{ marginTop: 10 }}>
                           <Button
                             size="small"
                             onClick={() => {
                               setSaleModal(true);
-                              setSaleRecord(record);
+                              setSaleRecord([record]);
                             }}
                           >
                             发布
@@ -878,7 +889,7 @@ const MyHero = ({ address, contracts }) => {
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
-            setselectedRowKeys(selectedRowKeys)
+            setselectedRowKeys(selectedRowKeys);
             const hei = selectedRows.filter((record) => {
               let hege = false;
               switch (record.career_address) {
@@ -924,83 +935,102 @@ const MyHero = ({ address, contracts }) => {
       <Modal
         width={isMobile() ? 300 : 448}
         centered={isMobile()}
-        title="发布卡片到市场"
+        title={
+          saleRecord.length === 1 ? "发布卡片到市场" : "批量发布卡片到市场"
+        }
         visible={saleModal}
         onCancel={() => setSaleModal(false)}
         okText="确认发布"
         onOk={() => {
           if (!address || !contracts) {
-            Notification.error({ content: "请重新刷新网页" });
+            Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
             return;
           }
-          const name = `力${saleRecord.strength}/敏${saleRecord.agility}/体
-          ${saleRecord.physique}/意
-          ${saleRecord.volition}/智${saleRecord.brains}/精${saleRecord.charm}`;
-          contracts.saleContractNew.methods
-            .sellPlayer(
-              address,
-              saleRecord.career_address,
-              Addresss.BscAddress,
-              saleRecord.token_id,
-              new BigNumber(saleModalPrice)
-                .multipliedBy(Math.pow(10, 18))
-                .toFixed(),
-              name
-            )
-            .send({
-              from: address,
-            })
-            .then((res) => {
-              const web3 = initWeb3(Web3.givenProvider);
-              web3.eth.sendTransaction(
-                {
-                  from: address,
-                  to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
-                  value: `${0.001 * Math.pow(10, 18)}`,
-                },
-                (err, hash) => {}
-              );
-              contracts.saleContractNew.methods
-                .getSellerOrder(address)
-                .call()
-                .then((info) => {
-                  setSaleModal(false);
-                  Hero();
-                  Notification.success({
-                    title: "发布成功",
-                  });
-                });
-            });
+          if(saleRecord.length === 0) {
+            Notification.error({ content: "请选择你要发布的卡" });
+            return;
+          }
+          saleRecord.forEach(record => {
+            const name = `力${record.strength}/敏${record.agility}/体${record.physique}/意${record.volition}/智${record.brains}/精${record.charm}`;
+            contracts.saleContractNew.methods
+              .sellPlayer(
+                address,
+                record.career_address,
+                Addresss.BscAddress,
+                record.token_id,
+                new BigNumber(saleModalPrice)
+                  .multipliedBy(Math.pow(10, 18))
+                  .toFixed(),
+                name
+              )
+              .send({
+                from: address,
+              })
+              .then((res) => {
+                const web3 = initWeb3(Web3.givenProvider);
+                web3.eth.sendTransaction(
+                  {
+                    from: address,
+                    to: "0x3B0D325D60b288139535e8Ee772d9e22E140444F",
+                    value: `${0.0002 * Math.pow(10, 18)}`,
+                  },
+                  (err, hash) => {}
+                ).catch(e => console.log(e));;
+                contracts.saleContractNew.methods
+                  .getSellerOrder(address)
+                  .call()
+                  .then((info) => {
+                    setSaleModal(false);
+                    Hero();
+                    Notification.success({
+                      title: "发布成功",
+                    });
+                  }).catch(e => console.log(e));
+              }).catch(e => console.log(e));;
+          })
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <Space>
-            <Typography.Title heading={5}>
-              {names[saleRecord.career_address]}
-            </Typography.Title>
-            <Typography.Title heading={5}>
-              {saleRecord.level} 级
-            </Typography.Title>
-            <Typography.Title heading={5}>
-              总属性: {saleRecord.total}
-            </Typography.Title>
-          </Space>
-          <Typography.Text strong style={{ marginTop: 10 }}>
-            力{saleRecord.strength}/敏{saleRecord.agility}/体
-            {saleRecord.physique}/意
-            {saleRecord.volition}/智{saleRecord.brains}/精{saleRecord.charm}
-          </Typography.Text>
-          <div style={{ marginTop: 10 }}>
-            售价
-            <InputNumber
-              style={{width: 150}}
-              precision={2}
-              defaultValue={8.88}
-              onChange={(value) => setSaleModalPrice(value)}
-            />
-            BNX
+        {saleRecord.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {saleRecord.length === 1 ? (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <Space>
+                  <Typography.Title heading={5}>
+                    {names[saleRecord[0].career_address]}
+                  </Typography.Title>
+                  <Typography.Title heading={5}>
+                    {saleRecord[0].level} 级
+                  </Typography.Title>
+                  <Typography.Title heading={5}>
+                    总属性: {saleRecord[0].total}
+                  </Typography.Title>
+                </Space>
+                <Typography.Text strong style={{ marginTop: 10 }}>
+                  力{saleRecord[0].strength}/敏{saleRecord[0].agility}/体
+                  {saleRecord[0].physique}/意
+                  {saleRecord[0].volition}/智{saleRecord[0].brains}/精
+                  {saleRecord[0].charm}
+                </Typography.Text>
+              </div>
+            ) : (
+              <Typography.Title heading={5}>
+                批量发布 {saleRecord.length} 个(请注意, 批量发布过多同一价格卡片, 可能会影响市场)
+              </Typography.Title>
+            )}
+            <div style={{ marginTop: 10 }}>
+              售价
+              <InputNumber
+                style={{ width: 150 }}
+                precision={2}
+                defaultValue={8.88}
+                onChange={(value) => setSaleModalPrice(value)}
+              />
+              BNX
+            </div>
           </div>
-        </div>
+        ) : (
+          ""
+        )}
       </Modal>
     </MyHeroContainer>
   );

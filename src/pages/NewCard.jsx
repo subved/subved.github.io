@@ -16,7 +16,7 @@ const NewCard = ({ address, contracts }) => {
 
   const getOneCard = async (num, trans) => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     Notification.info({ content: "抽卡中, 请耐心等待", duration: 20 });

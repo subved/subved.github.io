@@ -4,12 +4,12 @@ import "antd/dist/antd.css";
 import { MetamaskStateProvider } from "use-metamask";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import cookie from "react-cookies";
 import App from "./App";
 import { HashRouter } from "react-router-dom";
-import BnxTools from "./BnxTools";
 import { LocaleProvider } from "@douyinfe/semi-ui";
+import zh_CN from '@douyinfe/semi-ui/lib/es/locale/source/zh_CN';
 
+console.log(zh_CN)
 const firebaseConfig = {
   apiKey: "AIzaSyAfA970qMp5tM0hbrLVwtaFaToYz1bnCNA",
   authDomain: "toolcat-28074.firebaseapp.com",
@@ -22,7 +22,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+getAnalytics(app); // const analytics = 
 
 // cookie.save(
 //   "__cf_bm",

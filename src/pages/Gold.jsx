@@ -59,7 +59,7 @@ const Gold = ({ address, contracts }) => {
   // 工作中的卡
   const getWordCards = () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     const web3 = initWeb3(Web3.givenProvider);
@@ -231,7 +231,7 @@ const Gold = ({ address, contracts }) => {
   const getGold = (all, type = 0) => {
     return () => {
       if (!address || !contracts) {
-        Notification.error({ content: "请重新刷新网页" });
+        Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
         return;
       }
       if (type === 1) {
@@ -322,7 +322,7 @@ const Gold = ({ address, contracts }) => {
   const getBlockGold = (num) => {
     return () => {
       if (!address || !contracts) {
-        Notification.error({ content: "请重新刷新网页" });
+        Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
         return;
       }
       const a = gongzuoList
@@ -356,7 +356,7 @@ const Gold = ({ address, contracts }) => {
 
   const getFilterGold = () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     if (!filterWorkType) {
@@ -406,7 +406,7 @@ const Gold = ({ address, contracts }) => {
   const quitWork = (all, num = 0) => {
     return () => {
       if (!address) {
-        Notification.error({ content: "请重新刷新网页" });
+        Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
         return;
       }
       let list = all ? gongzuoList : myWorkCardSelectedList;

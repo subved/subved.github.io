@@ -79,7 +79,7 @@ const MaoXian = ({ address, contracts }) => {
 
   const Hero = async () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     setselectedRowKeys([]);
@@ -306,7 +306,7 @@ const MaoXian = ({ address, contracts }) => {
 
   const getBnxGold = () => {
     if (!address || !contracts) {
-      Notification.error({ content: "请重新刷新网页" });
+      Notification.info({ content: "3秒后不显示钱包地址, 请刷新网页" });
       return;
     }
     contracts.goldContractNew.methods
